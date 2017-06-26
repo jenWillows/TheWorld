@@ -11,11 +11,13 @@ namespace TheWorld
     {
         public static void Main(string[] args)
         {
+            //Instead of printing helloworld like in a console application,
+            //here, we start a web host builder. Kestrel is the name of the web server.
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
-                .UseStartup<Startup>()
+                .UseStartup<Startup>()  // create a new instance of Startup
                 .UseApplicationInsights()
                 .Build();
 
