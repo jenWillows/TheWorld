@@ -27,14 +27,14 @@
 
     // Jquery syntax.
     main.on("mouseenter", function () {
-        main[0].style= "background-color: #888;";
+        main.css("background-color", "#888");
     });
 
     //main.onmouseleave = function () {
     //    main.style.backgroundColor = "";
     //}
     main.on("mouseleave", function () {
-        main.style = "";
+        main.css("background-color", "");
     })
 
     var menuItems = $("ul.menu li a");
