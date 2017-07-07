@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TheWorld.Services;
 using Microsoft.Extensions.Configuration;
+using TheWorld.Models;
 
 namespace TheWorld
 {
@@ -20,6 +16,8 @@ namespace TheWorld
         public Startup(IHostingEnvironment env)
         {
             _env = env;
+
+            // Build configuration
             var builder = new ConfigurationBuilder()
                 .SetBasePath(_env.ContentRootPath)
                 .AddJsonFile("config.json");
@@ -43,13 +41,26 @@ namespace TheWorld
                 //Implement a real mail service
             }
 
+            // Register EF and worldContext.
+            services.AddDbContext<WorldContext>();
+            // Scope service, one per request cycle.
+            services.AddTransient<IWorldRepository, WorldRepository>();
+
+            services.AddTransient<WorldContextSeedData>();
+
+            services.AddLogging();
+
             // Add services that MVC knows about 
             services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         // Things to do when request comes in.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, 
+            IHostingEnvironment env, 
+            ILoggerFactory loggerFactory,
+            WorldContextSeedData seeder,
+            ILoggerFactory factory)
         {
             //Order is important.
             // Who is handling what, in what order.
@@ -57,9 +68,14 @@ namespace TheWorld
             //app.UseDefaultFiles();
 
             // If the environment is development, but how does it know? Sln properties -> debug -> environment variables
-            if (env.IsDevelopment())
+            if (env.IsEnvironment("Development"))
             {
                 app.UseDeveloperExceptionPage();
+                factory.AddDebug(LogLevel.Information);
+            }
+            else
+            {
+                factory.AddDebug(LogLevel.Error);
             }
 
 
@@ -73,6 +89,8 @@ namespace TheWorld
                     defaults: new { controller = "App", action = "Index" }
                     );
             });
+
+            seeder.EnsureSeedData().Wait();
         }
     }
 }

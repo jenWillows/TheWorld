@@ -1,5 +1,8 @@
 {
   "MailSettings": {
-    "ToAddress":  "zhen.jia@jefferson.kyschools.us"
+    "ToAddress": "zhen.jia@jefferson.kyschools.us"
+  },
+  "ConnectionStrings": {
+    "WorldContextConnection": "Server=(localdb)\\MSSQLLocalDB; Database=TheWorldDb; Trusted_Connection=true; MultipleActiveResultSets=true;"
   }
 }
